@@ -1,6 +1,6 @@
 import time
 
-async def close_popup(page, url, logger, config):
+async def close_popup(page, url, logger, config, counter):
     close_buttons = await page.get_by_label("Close").all()
     if close_buttons is None:
         return
@@ -12,5 +12,5 @@ async def close_popup(page, url, logger, config):
                 logger.info(f"Closing popup: {url}")
 
             await page.wait_for_load_state('domcontentloaded')
-            time.sleep(config.sleep_after_close_popup)
+            time.sleep(counter.passes)
     return True

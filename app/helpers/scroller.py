@@ -1,11 +1,11 @@
 import time
 
-async def scroll_to_bottom(page, url, config):
+async def scroll_to_bottom(page, url, config, counter):
     dom_height = await page.evaluate('''(() => window.innerHeight + window.scrollY)();''')
     prev_dom_height = None
     height_unchanged_counter = 0
     while True:
-      time.sleep(config.sleep_before_scroll)
+      time.sleep(counter.passes + 1)
       await page.evaluate('''!async function(){let n=await document.evaluate("//*[contains(@class, 'chakra-link') and contains(@class, 'css-187ams7')]",document,null,XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,null),a=n.snapshotLength-1;n.snapshotItem(a).scrollIntoView()}();''')
       for x in range(1,25):
         await page.keyboard.press("ArrowDown")

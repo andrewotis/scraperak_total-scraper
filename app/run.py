@@ -17,6 +17,8 @@ from Classes.Config import Config
 from helpers.source import gather_offers
 from Classes.Queue import Queue
 import traceback
+from app.database.models.Scrape import Scrape
+from tortoise.functions import Max
 
 def get_category_from_url(url):
     return url.path.replace("f/", "").replace("-", "_").replace("/", "")
@@ -41,14 +43,14 @@ async def scrape_page(page, path):
             await page.route("**/*", intercept_route)
 
         await page.goto(url.human_repr(), wait_until='domcontentloaded', timeout=config.timeout)
-        await close_popup(page, url, logger, config)
-        await scroll_to_bottom(page, url, config)
-        time.sleep(config.sleep_after_scroll)
+        await close_popup(page, url, logger, config, counter)
+        await scroll_to_bottom(page, url, config, counter)
+        time.sleep(counter.passes)
 
         if config.take_screenshots is True:
             await take_screenshot(page, url.path, logger, config)
 
-        time.sleep(config.sleep_after_screenshot)
+        time.sleep(counter.passes + 1)
         await get_page_source(page, url)
         queue.remove(path)
         return
@@ -72,11 +74,9 @@ async def worker(path):
 
 async def main():
     timer = Timer()
-    passes = 0
-
     running = True
     while running:
-        if passes > 0:
+        if counter.passes > 0:
             logger.info(f"Taking another pass through some categories that didn't scrape properly. There are {queue.size()} items in the queue still.")
         urls = queue.all()
         if config.max_workers == 1:
@@ -92,14 +92,21 @@ async def main():
         if queue.is_empty():
             logger.info("Finished visiting all the pages in the queue.")
             running = False
-        passes += 1
-        if passes == config.max_retries:
-            logger.error(f"Tried {config.max_retries} passes and could not scrape everything.")
+        counter.increment_passes()
+        if counter.passes == config.max_retries:
+            logger.error(f"Tried {counter.passes} passes and could not scrape everything.")
             running = False
 
     await gather_offers(source, config, logger)
     report = counter.report()
     run_time = timer.stop()
+
+    # update the most recent scrape in the database to include the execution_time
+    scrape = await Scrape.all().annotate(latest_created_at=Max("created_at")).values("latest_created_at")
+    scrape.execution_time = run_time
+    scrape.total_workers = config.max_workers
+    scrape.total_passes = counter.passes
+    scrape.save()
 
     send_sms_report(run_time, report, [], counter, logger)
     logger.info("Rakuten scrape finished in " + str(run_time))

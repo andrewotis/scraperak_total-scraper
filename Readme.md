@@ -13,8 +13,9 @@ This is a massive scraper that scrapes all rewards/offers from Rakuten and can e
 - extensively configurable. every detail from timeouts to whether or not to use concurrent futures to enabling screenshots is configurable
 - queueing and retries: the scraper will keep trying until it gathers all rewards on all categories
 - easy category maintenance: the pages to scrape are listed in a plain txt file (app/config.txt) and this can be modified easily to include new categories or remove unwanted ones[
-- when the scraper retrieves an offer/reward, there is a watcher (Observer patern) that can trigger logging the reward to the console, a JSON file, a database, or the app's log handlers. this way, any number of combinations can be used for the rewards output.
-- route interceptor: since we are loading quite a bit of pages/data, there is a route interceptor feature that will block certain web requests like fonts, 3rd party javascript files, google analytics, and more. this substantially cuts down on page loading time.
+- when the scraper retrieves an offer/reward, there is a watcher (Observer patern) that can trigger logging the reward to the console, a JSON file, a database, or the app's log handlers. this way, any number of combinations can be used for the rewards output
+- route interceptor: since we are loading quite a bit of pages/data, there is a route interceptor feature that will block certain web requests like fonts, 3rd party javascript files, google analytics, and more. this substantially cuts down on page loading time
+- dynamic sleeping: sometimes certain parts of the scrape require a sleep and sometimes they dont depending on how many rewards are available. rather than configure a value for this, the scrape is first tried without sleeps. if it ends up needing to use them, it will incrementally add one second to each sleep setting each time it does a pass
 
 # Database
 - Uses Tortoise ORM

@@ -13,6 +13,7 @@ class Counter:
         self.total_offers_found = 0
         self.scrape_failures = 0
         self.total_offers_processed = 0
+        self.passes = 0
 
         # data = {
         #     'accessories' : {
@@ -41,6 +42,9 @@ class Counter:
             self.data[category][key] += 1
         else:
             self.data[category][key] += by
+
+    def increment_passes(self):
+        self.passes += 1
 
     def mark_processed(self, category):
         if category not in self.data:
