@@ -15,6 +15,7 @@ from app.database.models.Category import Category
 
 class MySQL(Observer):
     async def initialize(self):
+        self.logger.info("Starting MySQL Observer")
         load_dotenv()
         db_url = os.getenv("DB_URL")
         await Tortoise.init(

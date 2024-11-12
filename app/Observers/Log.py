@@ -3,6 +3,7 @@ import asyncio
 
 class Log(Observer):
     async def initialize(self):
+        self.logger.info("Starting Log Observer")
         return await asyncio.sleep(0)
     async def add(self, entry):
         self.logger.info(f"Entry Received: {entry}")

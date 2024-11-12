@@ -6,6 +6,7 @@ import asyncio
 
 class File(Observer):
     async def initialize(self):
+        self.logger.info("Starting File Observer")
         self.results = []
         return await asyncio.sleep(0)
 
