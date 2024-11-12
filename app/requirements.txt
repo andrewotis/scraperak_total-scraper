@@ -1,0 +1,13 @@
+playwright
+rich
+telnyx
+python-dotenv
+yarl
+flask
+cssselect
+lxml
+mysql-connector-python
+pymysql
+cryptography
+tortoise-orm
+aiomysql
