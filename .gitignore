@@ -3,6 +3,7 @@ logs/
 screenshots/
 include/
 scripts/
+app/.env
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
