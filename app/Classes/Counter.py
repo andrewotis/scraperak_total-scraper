@@ -6,14 +6,13 @@ class Counter:
         self.cat_template = {
             'offers_found' : 0,
             'offers_processed' : 0,
-            'in_store_skipped' : 0,
             'scrape_failures' : 0,
+            'scrape_retries' : 0,
         }
 
         self.total_offers_found = 0
         self.scrape_failures = 0
         self.total_offers_processed = 0
-        self.skipping_in_store = 0
 
         # data = {
         #     'accessories' : {
@@ -42,9 +41,6 @@ class Counter:
             self.data[category][key] += 1
         else:
             self.data[category][key] += by
-
-    def mark_skipping_in_store(self, category):
-        self.skipping_in_store += 1
 
     def mark_processed(self, category):
         if category not in self.data:

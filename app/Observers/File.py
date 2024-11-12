@@ -13,10 +13,9 @@ class File(Observer):
         self.results.append(entry)
 
     def cleanup(self):
-        path = str(pathlib.Path().resolve())
-        old_exists = os.path.isfile(path + "../current-rewards.json")
+        old_exists = os.path.isfile(self.config.output_file)
         if old_exists:
-            os.remove(path + "../current-rewards.json")
+            os.remove(self.config.output_file)
 
-        with open(path + '../current-rewards.json', 'w') as f:
+        with open(self.config.output_file, 'w') as f:
             json.dump(self.results, f)

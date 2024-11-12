@@ -1,11 +1,13 @@
 class ScrapeWatcher:
-    def __init__(self, logger):
+    def __init__(self, logger, config):
         self._observers = []
         self._data = []
         self.logger = logger
+        self.config = config
 
     async def add_observer(self, observer):
         observer.add_logger(self.logger)
+        observer.add_config(self.config)
         await observer.initialize()
         self._observers.append(observer)
 

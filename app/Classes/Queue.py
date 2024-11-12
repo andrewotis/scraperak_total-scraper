@@ -1,13 +1,17 @@
 class Queue:
-    def __init__(self, data):
+    def __init__(self, data, logger):
         self.items = data
+        self.logger = logger
+        logger.info(f"Starting queue with {len(data)} items")
 
     def add(self, item):
+        self.logger.debug(f"Adding item to queue: {item}")
         self.items.append(item)
 
-    def remove_item(self, item):
-        index = self.items.index(item)
-        self.items.remove(index)
+    def remove(self, item):
+        self.logger.debug(f"Queue currently contains: {self.all()}. Removing item from queue: {item}")
+        filtered = [url for url in self.items if item != url]
+        self.items = filtered
 
     def next(self):
         if not self.is_empty():

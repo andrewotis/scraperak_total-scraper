@@ -77,7 +77,7 @@ async def process_agroup(agroup_element, category):
         print(traceback.format_exc())
 
 async def initialize_observers(config, logger):
-    subject = ScrapeWatcher(logger=logger)
+    subject = ScrapeWatcher(logger=logger, config=config)
 
     observers = []
     if config.enable_console_output:
@@ -100,15 +100,14 @@ async def initialize_observers(config, logger):
 
 
 async def gather_offers(data, config, logger):
-    results = []
+    logger.info("Starting XPath precision data extraction.")
     subject = await initialize_observers(config, logger)
     for item in data:
-        print(item['category'])
         tree = html.fromstring(item['source'])
         agroups = tree.xpath('/html/body/div/div/div/div/div/div/div/div/div/a')
-        print(f"found {str(len(agroups))} offer nodes")
+        logger.info(f"Found {len(agroups)} offer nodes for category {item['category']}")
         for agroup in agroups:
             offer = await process_agroup(agroup, item['category'])
             if offer is not None:
                 await subject.add_entry(offer)
-    return results
+    return True

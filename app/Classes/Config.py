@@ -10,11 +10,11 @@ class Config:
     sleep_after_scroll = None
     sleep_before_scroll = None
     sleep_after_screenshot = None
-    sleep_between_retries = None
     sleep_after_close_popup = None
     use_route_intercept = None
     take_screenshots = None
-    browserless_io_token = None
+    browserless_connection_string = None
+    output_file = None
 
     #observers
     enable_database_writing = None
@@ -28,16 +28,21 @@ class Config:
 
     def load_env_file(self):
         load_dotenv()
+        # ints
         self.max_workers = int(os.getenv("MAX_WORKERS"))
-        self.logging_level = os.getenv("LOGGING_LEVEL")
-        self.browserless_io_token = os.getenv("BROWSERLESS_IO_TOKEN")
+        self.sleep_after_scroll = int(os.getenv("SLEEP_AFTER_SCROLL"))
         self.max_retries = int(os.getenv("MAX_RETRIES"))
         self.timeout = int(os.getenv("TIMEOUT"))
         self.sleep_before_scroll = int(os.getenv("SLEEP_BEFORE_SCROLL"))
-        self.sleep_after_scroll = int(os.getenv("SLEEP_AFTER_SCROLL"))
-        self.sleep_between_retries=int(os.getenv("SLEEP_BETWEEN_RETRIES"))
         self.sleep_after_screenshot = int(os.getenv("SLEEP_AFTER_SCREENSHOT"))
         self.sleep_after_close_popup = int(os.getenv("SLEEP_AFTER_CLOSE_POPUP"))
+
+        # string
+        self.logging_level = os.getenv("LOGGING_LEVEL")
+        self.browserless_connection_string = os.getenv("BROWSERLESS_CONNECTION_STRING")
+        self.output_file = os.getenv("OUTPUT_FILE")
+
+        # bool
         if os.getenv("USE_ROUTE_INTERCEPT") == "True":
             self.use_route_intercept = True
         else:
