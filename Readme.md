@@ -2,7 +2,7 @@ This is a massive scraper that scrapes all rewards/offers from Rakuten and can e
 
 # NOTES:
 - This must use Python v3.12, anything later will produce unexpected results. Check the pyvenv.cfg file.
-- Building this was a lot of trial and error. It started out very fragile and over time when all the nuances/one-offs were seen, I had to restrategize. Over time, I whittled down activities in Playwright to what is now only scrolling the infinite-scroll, taking screenshots, and getting the page source. From there, I load the source and use lxml and XPath queries to traverse the DOM and extract the data
+- Building this was a lot of trial and error. Over time, I whittled down activities in Playwright to what is now only scrolling the infinite-scroll, taking screenshots, and getting the page source. From there, I load the source and use lxml and XPath queries to traverse the DOM and extract the data
 - Rakuten lists the same store/offer in multiple categories. So each entry is included with what category it came from in case categories are needed
 - Infinite-scrolling: Rakuten category pages use infinite-scrolling to load data real time as you scroll down the screen. This prevents a challenge for ensuring every possible offer is visible on the page to collect. The solution I came up with was to inject a custom javascript script into the page using Playwright that finds the very last offer on the screen and scrolls to it, waits for the page to load, and repeats while tracking page height across all scrolling. Once there are several scroll attempts without changes in the page height, it is safe to assume all offers are visible.
 
