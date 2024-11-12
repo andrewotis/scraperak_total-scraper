@@ -18,15 +18,16 @@ This is a massive scraper that scrapes all rewards/offers from Rakuten and can e
 
 # Database
 - Uses Tortoise ORM
-- Includes seeders for offer types and reward types
-
-# Logging
+- Includes seeders for offer types and reward types that also generate the schema
+- Includes models for all DB tables needed to store results
+- Support for SQLite, MySQL, and Postgres
 
 # Screenshots
 - Are entire page screenshots and can be VERY big both visually and with regard to file-size
 - Are PNG and of sufficient quality to zoom in and read offers
 - The screenshots will save in the following format meaning there is a maximum of one screenshot per category page per hour.
 
+# Logging
 
 # Installation
 1) py -v3.12 -m venv scraper
