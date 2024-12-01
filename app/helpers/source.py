@@ -5,6 +5,7 @@ from Observers.Console import Console
 from Observers.MySQL import MySQL
 from Observers.Log import Log
 from Observers.File import File
+from Observers.Context import Context
 
 async def serialize_element(element):
     return html.tostring(element, pretty_print=True, encoding="unicode")
@@ -59,7 +60,7 @@ async def process_agroup(agroup_element, category):
         return None
 
     try:
-        store = agroup_tree.xpath("//span/text()")[0]
+        store = agroup_tree.xpath("//span/text()")[0].replace("\\", "/")
         offer = agroup_tree.xpath("//span/text()")[1]
         reward_type, reward_amount, offer_type = await parse_offer(offer)
         return {
@@ -76,38 +77,42 @@ async def process_agroup(agroup_element, category):
         print(link)
         print(traceback.format_exc())
 
-async def initialize_observers(config, logger):
-    subject = ScrapeWatcher(logger=logger, config=config)
+async def initialize_observers(app):
+    subject = ScrapeWatcher(app)
+    app.add('watcher', subject)
 
     observers = []
-    if config.enable_console_output:
+    if app.get('config').enable_console_output:
         console = Console()
         observers.append(console)
-    if config.enable_database_writing:
+    if app.get('config').enable_database_writing:
         mysql = MySQL()
         observers.append(mysql)
-    if config.enable_log_file_writing:
+    if app.get('config').enable_log_file_writing:
         log = Log()
         observers.append(log)
-    if config.enable_output_file:
+    if app.get('config').enable_output_file:
         file = File()
         observers.append(file)
+    if app.get('config').enable_context_rewards:
+        ctx = Context()
+        observers.append(ctx)
 
     for observer in observers:
-        await subject.add_observer(observer)
+        app.get('watcher').add_observer(observer)
 
-    return subject
+    return app.get('watcher')
 
 
-async def gather_offers(data, config, logger):
-    logger.info("Starting XPath precision data extraction.")
-    subject = await initialize_observers(config, logger)
+async def gather_offers(data, app):
+    app.get('logger').info("Starting XPath precision data extraction.")
+    subject = await initialize_observers(app)
     for item in data:
         tree = html.fromstring(item['source'])
         agroups = tree.xpath('/html/body/div/div/div/div/div/div/div/div/div/a')
-        logger.info(f"Found {len(agroups)} offer nodes for category {item['category']}")
+        app.get('logger').info(f"Found {len(agroups)} offer nodes for category {item['category']}")
         for agroup in agroups:
             offer = await process_agroup(agroup, item['category'])
             if offer is not None:
-                await subject.add_entry(offer)
+                subject.add_entry(offer)
     return True

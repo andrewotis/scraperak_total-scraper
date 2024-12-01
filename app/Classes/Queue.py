@@ -9,7 +9,7 @@ class Queue:
         self.items.append(item)
 
     def remove(self, item):
-        self.logger.debug(f"Queue currently contains: {self.all()}. Removing item from queue: {item}")
+        self.logger.debug(f"Removing completed item from queue: {item}. Only {len(self.all())} items remaining in the queue!")
         filtered = [url for url in self.items if item != url]
         self.items = filtered
 

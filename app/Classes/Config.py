@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 
 class Config:
     urls = None
+    db_url = None
+    mode = None
     max_workers = None
     logging_level = None
     max_retries = None
@@ -15,11 +17,13 @@ class Config:
     take_screenshots = None
     browserless_connection_string = None
     output_file = None
+    enable_query_logging = None
 
     #observers
     enable_database_writing = None
     enable_console_output = None
     enable_log_file_writing = None
+    enable_context_rewards = None
     enable_output_file = None
 
     def __init__(self):
@@ -41,6 +45,15 @@ class Config:
         self.logging_level = os.getenv("LOGGING_LEVEL")
         self.browserless_connection_string = os.getenv("BROWSERLESS_CONNECTION_STRING")
         self.output_file = os.getenv("OUTPUT_FILE")
+        self.mode = os.getenv("MODE")
+        self.db_url = os.getenv("DB_URL")
+        self.enable_context_rewards = os.getenv("ENABLE_CONTEXT_REWARDS")
+        self.aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
+        self.aws_access_key = os.getenv("AWS_ACCESS_KEY")
+        self.aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID")
+        self.aws_s3_bucket_name = os.getenv('AWS_S3_BUCKET_NAME')
+        self.screenshot_storage_type = os.getenv("SCREENSHOT_STORAGE_TYPE")
+        self.screenshot_path = os.getenv("SCREENSHOT_PATH")
 
         # bool
         if os.getenv("USE_ROUTE_INTERCEPT") == "True":
@@ -67,6 +80,10 @@ class Config:
             self.enable_output_file = True
         else:
             self.enable_output_file = False
+        if os.getenv("ENABLE_QUERY_LOGGING") == "True":
+            self.enable_query_logging = True
+        else:
+            self.enable_query_logging = False
 
 
     def load_scraper_config(self):

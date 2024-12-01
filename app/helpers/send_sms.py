@@ -19,28 +19,29 @@ def send_sms(to, message):
             text=message,
         )
 
-def notify_admins(message):
+def notify_admins(message, app):
     destination_numbers = os.getenv('PHONE_NUMBERS').split(",")
 
     for number in destination_numbers:
         send_sms(number, message)
 
 
-def send_sms_report(runtime, report, results, counter, logger):
-    try:
-        msg = "TrackRak Scan Report\n\
-1 of 4: ScrapeRak\n\
-\n\
-Finished in: " +str(runtime) + "\n\
-Threads: "+ os.getenv("MAX_WORKERS") + "\n\
-Categories Scraped: " + str(len(report.keys())) + "\n\
-Offers Found: " + str(len(results)) + "\n\
-Offers Processed: " + str(counter.total_offers_processed) + "\n\
-Scrape failures: " + str(counter.get_scrape_failures())
-        notify_admins(msg)
-    except Exception as e:
-        logger.error(f"An error using the telnyx API: {e}")
-        print("[bold red]" + traceback.format_exc() + "[/bold red]")
-
-        msg = "There was a problem using the telnyx API: \n\npython stack trace:\n" + traceback.format_exc()
-        notify_admins(msg)
+def send_sms_report(app):
+    pass
+#     try:
+#         msg = "TrackRak Scan Report\n\
+# 1 of 4: ScrapeRak\n\
+# \n\
+# Finished in: " +str(runtime) + "\n\
+# Threads: "+ os.getenv("MAX_WORKERS") + "\n\
+# Categories Scraped: " + str(len(report.keys())) + "\n\
+# Offers Found: " + str(len(results)) + "\n\
+# Offers Processed: " + str(counter.total_offers_processed) + "\n\
+# Scrape failures: " + str(counter.get_scrape_failures())
+#         notify_admins(msg)
+#     except Exception as e:
+#         logger.error(f"An error using the telnyx API: {e}")
+#         print("[bold red]" + traceback.format_exc() + "[/bold red]")
+#
+#         msg = "There was a problem using the telnyx API: \n\npython stack trace:\n" + traceback.format_exc()
+#         notify_admins(msg)

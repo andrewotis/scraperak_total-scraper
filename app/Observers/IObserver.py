@@ -1,11 +1,8 @@
 from abc import ABC, abstractmethod
 
 class Observer(ABC):
-    def add_logger(self, logger):
-        self.logger = logger
-
-    def add_config(self, config):
-        self.config = config
+    def add_context(self, app):
+        self.app = app
 
     @abstractmethod
     def initialize(self):

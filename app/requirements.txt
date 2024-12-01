@@ -7,5 +7,4 @@ flask
 lxml
 pymysql
 cryptography
-tortoise-orm
 aiomysql

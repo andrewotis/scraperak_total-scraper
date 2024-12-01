@@ -1,23 +1,25 @@
 from Observers.IObserver import Observer
 import json
-from pathlib import Path
 import os
-import asyncio
 
 class File(Observer):
-    async def initialize(self):
-        self.filepath = Path(self.config.output_file)
-        self.logger.info("Starting File Observer")
-        self.results = []
-        return await asyncio.sleep(0)
+    results = []
 
-    async def add(self, entry):
+    def initialize(self):
+        self.app.get('logger').info("Starting File Observer")
+        # absolute path in context is D:\scraperak-total\scraper
+
+    def add(self, entry):
         self.results.append(entry)
 
     def cleanup(self):
-        old_exists = os.path.isfile(self.filepath)
-        if old_exists:
-            os.remove(self.filepath)
+        path = f"output/{self.app.get('config').output_file}"
 
-        with open(self.filepath, 'w') as f:
-            json.dump(self.results, f)
+        old_exists = os.path.isfile(path)
+        if old_exists:
+            os.remove(path)
+
+        os.makedirs('output', exist_ok=True)
+
+        with open(path, "w") as json_file:
+            json.dump(self.results, json_file, indent=4)

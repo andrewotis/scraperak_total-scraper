@@ -1,41 +1,21 @@
-from tortoise import Tortoise
-from dotenv import load_dotenv
-from tortoise.exceptions import DoesNotExist
-
 from Observers.IObserver import Observer
-import asyncio
-import os
-from app.database.models.Store import Store
-from app.database.models.Scrape import Scrape
-from app.database.models.Reward import Reward
-from app.database.models.OfferType import OfferType
-from app.database.models.RewardType import RewardType
-from app.database.models.RewardCategory import RewardCategory
-from app.database.models.Category import Category
+from dbmodule.operations import ScrapeDB, StoreDB, OfferTypeDB, RewardTypeDB, RewardDB, CategoryDB
+import logging
 
 class MySQL(Observer):
-    async def initialize(self):
-        self.logger.info("Starting MySQL Observer")
-        load_dotenv()
-        db_url = os.getenv("DB_URL")
-        await Tortoise.init(
-            db_url=db_url,
-            modules={'models':
-                 [
-                     'app.database.models.Category',
-                     'app.database.models.OfferType',
-                     'app.database.models.Reward',
-                     'app.database.models.RewardCategory',
-                     'app.database.models.RewardType',
-                     'app.database.models.Scrape',
-                     'app.database.models.Store'
-                 ]
-             }
-        )
-        self.scrape = await Scrape.create()
-        return await asyncio.sleep(0)
+    def initialize(self):
+        self.scrape_db = ScrapeDB()
+        self.app.get('logger').info("Starting MySQL Observer")
 
-    async def add(self, entry):
+        self.store = StoreDB()
+        self.offer_type = OfferTypeDB()
+        self.reward = RewardDB()
+        self.category = CategoryDB()
+        self.reward_type = RewardTypeDB()
+        scrape = self.scrape_db.create()
+        self.scrape_id = scrape.id
+
+    def add(self, entry):
         # algo:
         # 1:    look up/add store
         #   1a:     if there, verify we have the correct URL and rakuten links
@@ -47,28 +27,36 @@ class MySQL(Observer):
         # 5:    look up category
         #   5a:     if not there, add it
         # 6:    create reward_category record
-
-        try:
-            store = await Store.get(name__iexact=entry['store'])
+        self.app.get('logger').info(f"entry: {entry}")
+        # try:
+        store = self.store.get_by_name(entry['store'])
+        if store is None:
+            store = self.store.create(name=entry['store'], url=entry['store_url'], rakuten_url=entry['shopping_url'])
+        else:
             if entry['store_url'] != store.url:
-                store.url = entry['store_url']
-                await store.save()
+                self.store.update_url_by_name(entry['store'], entry['store_url'])
             if entry['shopping_url'] != store.rakuten_url:
-                store.rakuten_url = entry['shopping_url']
-                await store.save()
-        except DoesNotExist:
-            store = await Store.create(name=entry['store'], url=entry['store_url'], rakuten_url=entry['shopping_url'])
+                self.store.update_rakuten_url_by_name(entry['store'], entry['shopping_url'])
 
-        offer_type = await OfferType.get(description__icontains=entry['offer_type'])
-        reward_type = await RewardType.get(description__icontains=entry['reward_type'])
-        reward = await Reward.create(scrape=self.scrape, store=store, reward_type=reward_type, offer_type=offer_type, amount=entry['reward_amount'])
 
-        try:
-            category = await Category.get(description__icontains=entry['category'])
-        except DoesNotExist:
-            category = await Category.create(description=entry['category'])
+        offer_type = self.offer_type.get_by_description(entry['offer_type'])
+        reward_type = self.reward_type.get_by_description(entry['reward_type'])
+        reward = self.reward.create(scrape_id=self.scrape_id, store_id=store.id, reward_type_id=reward_type.id, offer_type_id=offer_type.id, amount=entry['reward_amount'])
 
-        reward_category = await RewardCategory.create(reward=reward, category=category)
+        category = self.category.get_by_description(entry['category'])
+        if category is None:
+            category = self.category.create(description=entry['category'])
+
+        reward_category = self.category.add_to_reward(category.description, reward.id)
 
     def cleanup(self):
-        pass
+        if self.app.get('config').max_workers < len(self.app.get('config').urls):
+            total_workers = self.app.get('config').max_workers
+        else:
+            total_workers = len(self.app.get('config').urls)
+        self.scrape_db.update(
+            self.scrape_id,
+            self.app.get('timer').format_duration(),
+            total_workers,
+            self.app.get('counter').passes
+        )
