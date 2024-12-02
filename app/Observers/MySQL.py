@@ -38,10 +38,14 @@ class MySQL(Observer):
             self.app.get('logger').debug(f"store {entry['store']} was not found and was added.")
             store = self.store.get_by_name(entry['store'])
             self.app.get('logger').debug(f"This is now the results of the store query: {store}, len: {len(store)}")
+        elif len(store) == 1:
+            store = store[0]
+        else:
+            self.app.get('logger').debug(f"More than one store found for this. Please narrow your search down and try againsssssss")
 
         offer_type = self.offer_type.get_by_description(entry['offer_type'])
         reward_type = self.reward_type.get_by_description(entry['reward_type'])
-        self.app.get('logger').debug(f"store entry is now {store}. store.id is {store.id}")
+        self.app.get('logger').debug(f"store entry is now {store}. store.id is {store['id']}")
         reward = self.reward.create(scrape_id=self.scrape_id, store_id=store.id, reward_type_id=reward_type.id, offer_type_id=offer_type.id, amount=entry['reward_amount'])
 
         category = self.category.get_by_description(entry['category'])
