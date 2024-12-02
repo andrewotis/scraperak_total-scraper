@@ -29,7 +29,7 @@ class MySQL(Observer):
         # 6:    create reward_category record
         self.app.get('logger').info(f"entry: {entry}")
         # try:
-        store = self.store.get_by_name(entry['store'])
+        store = self.store.get_by_name(entry['store'], self.app.get('logger'))
         self.app.get('logger').debug(f"result of the store query: {store}")
         
         if store is None:
