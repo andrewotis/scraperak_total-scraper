@@ -32,11 +32,12 @@ class MySQL(Observer):
         store = self.store.get_by_name(entry['store'], self.app.get('logger'))
         self.app.get('logger').debug(f"result of the store query: {store}. store len is {len(store)}")
         
-        if store is None:
-            self.app.get('logger').debug(f"store {entry['store']} is None. Adding.")
-            self.store.create(name=entry['store'], url=entry['store_url'], rakuten_url=entry['shopping_url'])
+        if len(store) == 0:
+            store = self.store.create(name=entry['store'], url=entry['store_url'], rakuten_url=entry['shopping_url'])
+            self.app.get('logger').debug(f"store is now {store}, len: {len(store)}")
+            self.app.get('logger').debug(f"store {entry['store']} was not found and was added.")
             store = self.store.get_by_name(entry['store'])
-            self.app.get('logger').debug(f"store entry is now {store}")
+            self.app.get('logger').debug(f"This is now the results of the store query: {store}, len: {len(store)}")
 
         offer_type = self.offer_type.get_by_description(entry['offer_type'])
         reward_type = self.reward_type.get_by_description(entry['reward_type'])
