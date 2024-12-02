@@ -30,7 +30,7 @@ class MySQL(Observer):
         self.app.get('logger').info(f"entry: {entry}")
         # try:
         store = self.store.get_by_name(entry['store'], self.app.get('logger'))
-        self.app.get('logger').debug(f"result of the store query: {store}")
+        self.app.get('logger').debug(f"result of the store query: {store}. store len is {len(store)}")
         
         if store is None:
             self.app.get('logger').debug(f"store {entry['store']} is None. Adding.")
