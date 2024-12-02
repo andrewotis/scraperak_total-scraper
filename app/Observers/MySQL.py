@@ -30,18 +30,14 @@ class MySQL(Observer):
         self.app.get('logger').info(f"entry: {entry}")
         # try:
         store = self.store.get_by_name(entry['store'], self.app.get('logger'))
-        self.app.get('logger').debug(f"result of the store query: {store}. store len is {len(store)}")
+        self.app.get('logger').debug(f"result of the store query: {store}")
         
-        if len(store) == 0:
+        if store is None:
             store = self.store.create(name=entry['store'], url=entry['store_url'], rakuten_url=entry['shopping_url'])
             self.app.get('logger').debug(f"store is now {store}")
             self.app.get('logger').debug(f"store {entry['store']} was not found and was added.")
             store = self.store.get_by_name(entry['store'])
-            self.app.get('logger').debug(f"This is now the results of the store query: {store}, len: {len(store)}")
-        elif len(store) == 1:
-            store = store[0]
-        else:
-            self.app.get('logger').debug(f"More than one store found for this. Please narrow your search down and try againsssssss")
+            self.app.get('logger').debug(f"This is now the results of the store query: {store}")
 
         offer_type = self.offer_type.get_by_description(entry['offer_type'])
         reward_type = self.reward_type.get_by_description(entry['reward_type'])
