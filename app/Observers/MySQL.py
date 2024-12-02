@@ -41,7 +41,7 @@ class MySQL(Observer):
 
         offer_type = self.offer_type.get_by_description(entry['offer_type'])
         reward_type = self.reward_type.get_by_description(entry['reward_type'])
-        self.app.get('logger').debug(f"store entry is now {store}")
+        self.app.get('logger').debug(f"store entry is now {store}. store.id is {store.id}")
         reward = self.reward.create(scrape_id=self.scrape_id, store_id=store.id, reward_type_id=reward_type.id, offer_type_id=offer_type.id, amount=entry['reward_amount'])
 
         category = self.category.get_by_description(entry['category'])
