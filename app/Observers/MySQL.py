@@ -31,13 +31,9 @@ class MySQL(Observer):
         # try:
         store = self.store.get_by_name(entry['store'])
         if store is None:
-            store = self.store.create(name=entry['store'], url=entry['store_url'], rakuten_url=entry['shopping_url'])
-        else:
-            if entry['store_url'] != store.url:
-                self.store.update_url_by_name(entry['store'], entry['store_url'])
-            if entry['shopping_url'] != store.rakuten_url:
-                self.store.update_rakuten_url_by_name(entry['store'], entry['shopping_url'])
-
+            self.app.get('logger').debug(f"store {entry['store']} is None. Adding.")
+            self.store.create(name=entry['store'], url=entry['store_url'], rakuten_url=entry['shopping_url'])
+            store = self.store.get_by_name(entry['store'])
 
         offer_type = self.offer_type.get_by_description(entry['offer_type'])
         reward_type = self.reward_type.get_by_description(entry['reward_type'])
