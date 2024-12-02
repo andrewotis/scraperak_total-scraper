@@ -30,6 +30,8 @@ class MySQL(Observer):
         self.app.get('logger').info(f"entry: {entry}")
         # try:
         store = self.store.get_by_name(entry['store'])
+        self.app.get('logger').debug(f"result of the store query: {store}")
+        
         if store is None:
             self.app.get('logger').debug(f"store {entry['store']} is None. Adding.")
             self.store.create(name=entry['store'], url=entry['store_url'], rakuten_url=entry['shopping_url'])
