@@ -34,7 +34,7 @@ class MySQL(Observer):
         
         if len(store) == 0:
             store = self.store.create(name=entry['store'], url=entry['store_url'], rakuten_url=entry['shopping_url'])
-            self.app.get('logger').debug(f"store is now {store}, len: {len(store)}")
+            self.app.get('logger').debug(f"store is now {store}")
             self.app.get('logger').debug(f"store {entry['store']} was not found and was added.")
             store = self.store.get_by_name(entry['store'])
             self.app.get('logger').debug(f"This is now the results of the store query: {store}, len: {len(store)}")
